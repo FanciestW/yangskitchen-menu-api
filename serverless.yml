@@ -1,6 +1,9 @@
 app: yangskitchen-menu-api
 service: yangskitchen-menu-api
 
+plugins:
+  - serverless-offline
+
 provider:
   name: aws
   runtime: nodejs12.x
@@ -13,3 +16,7 @@ functions:
     events:
       - http: ANY /
       - http: 'ANY {proxy+}'
+
+custom:
+  serverless-offline:
+    httpPort: 8080
