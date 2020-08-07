@@ -7,6 +7,7 @@ const Memcached = require('memcached');
 const memcached = new Memcached(process.env.MEMCACHED_URL);
 
 app.get('/menu', function (_req, res) {
+  console.log(`Memcached URL: ${process.env.MEMCACHED_URL}`);
   memcached.get('menu', (err, data) => {
     if (data) {
       // Cache Hit
@@ -70,7 +71,7 @@ app.get('/setmenu', function (_req, res) {
     });
 });
 
-app.get('/testget', function (_req, res) {
+app.get('/getmenu', function (_req, res) {
   memcached.get('menu', (err, data) => {
     if (err) {
       console.error(err);
