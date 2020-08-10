@@ -1,19 +1,22 @@
 require('dotenv').config();
+const Axios = require('axios');
 const { google } = require('googleapis');
 const serverless = require('serverless-http');
 const express = require('express');
 const app = express();
 const Memcached = require('memcached');
-const memcached = new Memcached(process.env.MEMCACHED_URL);
+const memcached = new Memcached(process.env.MEMCACHED_URL, { timeout: 10 });
 
 app.get('/menu', function (_req, res) {
   console.log(`Memcached URL: ${process.env.MEMCACHED_URL}`);
-  memcached.get('menu', (err, data) => {
+  memcached.get('menu', async (err, data) => {
     if (data) {
       // Cache Hit
+      console.log('Cache Hit');
       return res.status(200).send(JSON.stringify({ data }));
     } else if (err || !data) {
       // Cache Miss
+      console.log('Cache Miss');
       const sheets = google.sheets({ version: 'v4', auth: process.env.GOOGLE_SHEETS_API_KEY });
       sheets.spreadsheets.values
         .get({
@@ -21,6 +24,7 @@ app.get('/menu', function (_req, res) {
           range: 'Sheet1!A1:D150',
         })
         .then((response) => {
+          console.log('Google Sheet Response');
           const keys = response.data.values.shift();
           let formattedData = [];
           response.data.values.forEach((row) => {
@@ -30,10 +34,11 @@ app.get('/menu', function (_req, res) {
             });
             formattedData.push(dataObject);
           });
+          console.log('Setting Memcached Key');
           memcached.set('menu', formattedData, 60 * 60 * 24, (err) => {
             if (err) console.error(err);
+            else return res.status(200).send(JSON.stringify({ data: formattedData }));
           });
-          return res.status(200).send(JSON.stringify({ data: formattedData }));
         })
         .catch((err) => {
           console.error(err);
@@ -81,6 +86,11 @@ app.get('/getmenu', function (_req, res) {
     }
     return res.status(200).send(JSON.stringify({ data }));
   });
+});
+
+app.get('/test', async function (_req, res) {
+  const data = await Axios.get('https://www.metaweather.com/api/location/1522006');
+  return res.status(200).send(JSON.stringify({ data: data.data }));
 });
 
 if (!process.env.SERVERLESS) {

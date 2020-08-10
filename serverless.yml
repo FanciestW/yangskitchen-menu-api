@@ -1,3 +1,4 @@
+org: fanciestw
 app: yangskitchen-menu-api
 service: yangskitchen-menu-api
 
@@ -10,10 +11,10 @@ provider:
   region: us-east-1
   vpc:
     securityGroupIds:
-      - 'sg-08eb308ed186e948f'
+      - 'sg-5d8bc526'
     subnetIds:
-      - 'subnet-03fdf575'
-      - 'subnet-a8c39b82'
+      # - 'subnet-03fdf575'
+      - 'subnet-da21a9d6'
   environment:
     SERVERLESS: true
     GOOGLE_SHEET_ID: ${file(./env.${opt:stage, self:provider.stage, 'prod'}.json):GOOGLE_SHEET_ID}
