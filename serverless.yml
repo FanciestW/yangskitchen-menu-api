@@ -29,11 +29,11 @@ functions:
       App: YangsKitchen
     vpc:
       securityGroupIds:
-        - "sg-02519b6f7db590e6e"
-        - "sg-5d8bc526"
+        - "sg-00fce8b950572ae57"
       subnetIds:
-        - "subnet-a8c39b82"
-        - "subnet-03fdf575"
+        - "subnet-0c0b8383f121ed28b"
+        - "subnet-0a772da0522bb9d6d"
+        - "subnet-038387697bf17cc69"
 
 custom:
   serverless-offline:

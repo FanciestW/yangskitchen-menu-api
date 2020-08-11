@@ -94,11 +94,6 @@ app.get('/flushcache', function (_req, res) {
   });
 });
 
-app.get('/test', async function (_req, res) {
-  const data = await Axios.get('https://www.metaweather.com/api/location/1522006');
-  return res.status(200).send(JSON.stringify({ data: data.data }));
-});
-
 if (!process.env.SERVERLESS) {
   const port = process.env.PORT || 8080;
   app.listen(port, () => {
