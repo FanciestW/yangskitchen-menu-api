@@ -9,12 +9,6 @@ provider:
   name: aws
   stage: ${opt:stage,'prod'}
   region: us-east-1
-  vpc:
-    securityGroupIds:
-      - 'sg-5d8bc526'
-    subnetIds:
-      # - 'subnet-03fdf575'
-      - 'subnet-da21a9d6'
   environment:
     SERVERLESS: true
     GOOGLE_SHEET_ID: ${file(./env.${opt:stage, self:provider.stage, 'prod'}.json):GOOGLE_SHEET_ID}
@@ -23,16 +17,23 @@ provider:
 
 functions:
   yangskitchen-menu-api:
-    name: 'yangskitchen-menu-api'
-    description: ''
+    name: "yangskitchen-menu-api"
+    description: ""
     runtime: nodejs12.x
     handler: index.handler
     events:
       - http: ANY /
-      - http: 'ANY {proxy+}'
+      - http: "ANY {proxy+}"
     timeout: 10
     tags:
       App: YangsKitchen
+    vpc:
+      securityGroupIds:
+        - "sg-02519b6f7db590e6e"
+        - "sg-5d8bc526"
+      subnetIds:
+        - "subnet-a8c39b82"
+        - "subnet-03fdf575"
 
 custom:
   serverless-offline:

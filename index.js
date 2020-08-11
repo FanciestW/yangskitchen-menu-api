@@ -5,16 +5,15 @@ const serverless = require('serverless-http');
 const express = require('express');
 const app = express();
 const Memcached = require('memcached');
-const memcached = new Memcached(process.env.MEMCACHED_URL, { timeout: 10 });
+const memcached = new Memcached(process.env.MEMCACHED_URL, { timeout: 10, maxExpiration: 604800 });
 
 app.get('/menu', function (_req, res) {
-  console.log(`Memcached URL: ${process.env.MEMCACHED_URL}`);
-  memcached.get('menu', async (err, data) => {
+  memcached.get('menu', (err, data) => {
     if (data) {
       // Cache Hit
       console.log('Cache Hit');
-      return res.status(200).send(JSON.stringify({ data }));
-    } else if (err || !data) {
+      return res.status(200).send({ data });
+    } else {
       // Cache Miss
       console.log('Cache Miss');
       const sheets = google.sheets({ version: 'v4', auth: process.env.GOOGLE_SHEETS_API_KEY });
@@ -24,7 +23,6 @@ app.get('/menu', function (_req, res) {
           range: 'Sheet1!A1:D150',
         })
         .then((response) => {
-          console.log('Google Sheet Response');
           const keys = response.data.values.shift();
           let formattedData = [];
           response.data.values.forEach((row) => {
@@ -34,10 +32,11 @@ app.get('/menu', function (_req, res) {
             });
             formattedData.push(dataObject);
           });
-          console.log('Setting Memcached Key');
           memcached.set('menu', formattedData, 60 * 60 * 24, (err) => {
             if (err) console.error(err);
-            else return res.status(200).send(JSON.stringify({ data: formattedData }));
+            else {
+              return res.status(200).send(JSON.stringify({ data: formattedData }));
+            }
           });
         })
         .catch((err) => {
@@ -84,7 +83,14 @@ app.get('/getmenu', function (_req, res) {
     } else if (!data) {
       return res.sendStatus(204);
     }
-    return res.status(200).send(JSON.stringify({ data }));
+    return res.status(200).send(data);
+  });
+});
+
+app.get('/flushcache', function (_req, res) {
+  memcached.flush((err) => {
+    if (err) return res.sendStatus(500);
+    else return res.sendStatus(200);
   });
 });
 
