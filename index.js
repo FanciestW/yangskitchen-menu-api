@@ -60,7 +60,7 @@ app.get('/setmenu', function (_req, res) {
   sheets.spreadsheets.values
     .get({
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
-      range: 'Sheet1!A1:D150',
+      range: 'Sheet1!A1:G200',
     })
     .then((response) => {
       const keys = response.data.values.shift();
