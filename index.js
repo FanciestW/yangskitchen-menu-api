@@ -7,7 +7,15 @@ const app = express();
 const Memcached = require('memcached');
 const memcached = new Memcached(process.env.MEMCACHED_URL, { timeout: 10, maxExpiration: 604800 });
 
+app.use((req, _res, next) => {
+  console.log(`URL: ${req.protocol + '://' + req.get('host') + req.originalUrl}`);
+  next();
+});
+
 app.get('/menu', function (_req, res) {
+  memcached.connect(process.env.MEMCACHED_URL, (err) => {
+    if (err) console.error(err);
+  });
   memcached.get('menu', (err, data) => {
     if (data) {
       // Cache Hit
@@ -92,6 +100,11 @@ app.get('/flushcache', function (_req, res) {
     if (err) return res.sendStatus(500);
     else return res.sendStatus(200);
   });
+});
+
+app.get('/test', async function (_req, res) {
+  const data = await Axios.get('https://www.metaweather.com/api/location/1522006');
+  return res.status(200).send(JSON.stringify({ data: data.data }));
 });
 
 if (!process.env.SERVERLESS) {

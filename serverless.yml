@@ -9,31 +9,33 @@ provider:
   name: aws
   stage: ${opt:stage,'prod'}
   region: us-east-1
-  environment:
-    SERVERLESS: true
-    GOOGLE_SHEET_ID: ${file(./env.${opt:stage, self:provider.stage, 'prod'}.json):GOOGLE_SHEET_ID}
-    GOOGLE_SHEETS_API_KEY: ${file(./env.${opt:stage, self:provider.stage, 'prod'}.json):GOOGLE_SHEETS_API_KEY}
-    MEMCACHED_URL: ${file(./env.${opt:stage, self:provider.stage, 'prod'}.json):MEMCACHED_URL}
+  stackTag:
+    App: YangsKitchen
 
 functions:
   yangskitchen-menu-api:
-    name: "yangskitchen-menu-api"
-    description: ""
+    name: 'yangskitchen-menu-api'
+    description: ''
     runtime: nodejs12.x
     handler: index.handler
     events:
       - http: ANY /
-      - http: "ANY {proxy+}"
+      - http: 'ANY {proxy+}'
     timeout: 10
     tags:
       App: YangsKitchen
     vpc:
       securityGroupIds:
-        - "sg-00fce8b950572ae57"
+        - 'sg-00fce8b950572ae57'
+        - 'sg-03100bbc30047e854'
       subnetIds:
-        - "subnet-0c0b8383f121ed28b"
-        - "subnet-0a772da0522bb9d6d"
-        - "subnet-038387697bf17cc69"
+        - 'subnet-038387697bf17cc69'
+        - 'subnet-01e563f2c39f88cc4'
+    environment:
+      SERVERLESS: true
+      GOOGLE_SHEET_ID: ${file(./env.${opt:stage, self:provider.stage, 'prod'}.json):GOOGLE_SHEET_ID}
+      GOOGLE_SHEETS_API_KEY: ${file(./env.${opt:stage, self:provider.stage, 'prod'}.json):GOOGLE_SHEETS_API_KEY}
+      MEMCACHED_URL: ${file(./env.${opt:stage, self:provider.stage, 'prod'}.json):MEMCACHED_URL}
 
 custom:
   serverless-offline:
