@@ -67,7 +67,7 @@ app.get('/setmenu', function (_req, res) {
       response.data.values.forEach((row) => {
         let dataObject = {};
         row.forEach((val, i) => {
-          dataObject[keys[i]] = val;
+          if (val) dataObject[keys[i]] = val;
         });
         formattedData.push(dataObject);
       });
