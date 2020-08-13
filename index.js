@@ -28,24 +28,23 @@ app.get('/menu', function (_req, res) {
       sheets.spreadsheets.values
         .get({
           spreadsheetId: process.env.GOOGLE_SHEET_ID,
-          range: 'Sheet1!A1:D150',
+          range: 'Sheet1!A1:G200',
         })
         .then((response) => {
+          console.log('Google Sheet Response');
           const keys = response.data.values.shift();
           let formattedData = [];
           response.data.values.forEach((row) => {
             let dataObject = {};
             row.forEach((val, i) => {
-              dataObject[keys[i]] = val;
+              if (val) dataObject[keys[i]] = val;
             });
             formattedData.push(dataObject);
           });
           memcached.set('menu', formattedData, 60 * 60 * 24, (err) => {
             if (err) console.error(err);
-            else {
-              return res.status(200).send(JSON.stringify({ data: formattedData }));
-            }
           });
+          return res.status(200).send(JSON.stringify({ data: formattedData }));
         })
         .catch((err) => {
           console.error(err);
@@ -93,18 +92,6 @@ app.get('/getmenu', function (_req, res) {
     }
     return res.status(200).send(data);
   });
-});
-
-app.get('/flushcache', function (_req, res) {
-  memcached.flush((err) => {
-    if (err) return res.sendStatus(500);
-    else return res.sendStatus(200);
-  });
-});
-
-app.get('/test', async function (_req, res) {
-  const data = await Axios.get('https://www.metaweather.com/api/location/1522006');
-  return res.status(200).send(JSON.stringify({ data: data.data }));
 });
 
 if (!process.env.SERVERLESS) {

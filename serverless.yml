@@ -37,6 +37,24 @@ functions:
       GOOGLE_SHEETS_API_KEY: ${file(./env.${opt:stage, self:provider.stage, 'prod'}.json):GOOGLE_SHEETS_API_KEY}
       MEMCACHED_URL: ${file(./env.${opt:stage, self:provider.stage, 'prod'}.json):MEMCACHED_URL}
 
+  yangs-menu-memcached-flush:
+    name: 'yangs-menu-memcached-flush'
+    description: 'Function to flush the YangsKitchen Menu Memcached'
+    runtime: nodejs12.x
+    handler: flush.handler
+    timeout: 10
+    tags:
+      App: YangsKitchen
+    vpc:
+      securityGroupIds:
+        - 'sg-00fce8b950572ae57'
+        - 'sg-03100bbc30047e854'
+      subnetIds:
+        - 'subnet-038387697bf17cc69'
+        - 'subnet-01e563f2c39f88cc4'
+    environment:
+      MEMCACHED_URL: ${file(./env.${opt:stage, self:provider.stage, 'prod'}.json):MEMCACHED_URL}
+
 custom:
   serverless-offline:
     httpPort: 8080
