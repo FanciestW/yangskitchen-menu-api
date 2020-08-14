@@ -33,13 +33,18 @@ app.get('/menu', function (_req, res) {
         .then((response) => {
           console.log('Google Sheet Response');
           const keys = response.data.values.shift();
-          let formattedData = [];
+          let formattedData = {};
           response.data.values.forEach((row) => {
             let dataObject = {};
             row.forEach((val, i) => {
-              if (val) dataObject[keys[i]] = val;
+              if (val && keys[i] !== 'Section') dataObject[keys[i]] = val;
             });
-            formattedData.push(dataObject);
+            const sectionName = row[keys.indexOf('Section')];
+            if (sectionName in formattedData) {
+              formattedData[sectionName].push(dataObject);
+            } else {
+              formattedData[sectionName] = [dataObject];
+            }
           });
           memcached.set('menu', formattedData, 60 * 60 * 24, (err) => {
             if (err) console.error(err);
