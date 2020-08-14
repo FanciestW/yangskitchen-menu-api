@@ -1,5 +1,4 @@
 require('dotenv').config();
-const Axios = require('axios');
 const { google } = require('googleapis');
 const serverless = require('serverless-http');
 const express = require('express');
