@@ -1,19 +1,26 @@
 {
   "name": "yangskitchen-menu-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "Serverless function to retreive menu data from Google Sheets.",
   "main": "index.js",
   "scripts": {
+    "start": "sls --stage=dev offline",
+    "dev": "sls --stage=dev offline",
+    "deploy": "sls --stage=prod deploy",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "FanciestW",
+  "license": "MIT",
   "dependencies": {
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "googleapis": "^39.2.0",
+    "memcached": "^2.2.2",
     "serverless-http": "^2.5.0"
   },
   "devDependencies": {
-    "eslint": "^7.6.0"
+    "eslint": "^7.6.0",
+    "serverless-offline": "^6.5.0"
   }
 }
