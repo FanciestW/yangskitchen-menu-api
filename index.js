@@ -36,7 +36,13 @@ app.get('/menu', function (_req, res) {
           response.data.values.forEach((row) => {
             let dataObject = {};
             row.forEach((val, i) => {
-              if (val && keys[i] !== 'Section') dataObject[keys[i]] = val;
+              if (!val || keys[i].toLowerCase() === 'section') {
+                return;
+              } else if (keys[i].toLowerCase() === 'spicy') {
+                val.toLowerCase() === 'true' ? (dataObject[keys[i]] = true) : (dataObject[keys[i]] = undefined);
+              } else {
+                dataObject[keys[i]] = val;
+              }
             });
             const sectionName = row[keys.indexOf('Section')];
             if (sectionName in formattedData) {
@@ -52,7 +58,7 @@ app.get('/menu', function (_req, res) {
         })
         .catch((err) => {
           console.error(err);
-          return res.status(500).send(JSON.stringify({ err }));
+          if (!res.headersSent) return res.status(500).send(JSON.stringify({ err }));
         });
     }
   });
@@ -82,7 +88,7 @@ app.get('/setmenu', function (_req, res) {
     })
     .catch((err) => {
       console.error(err);
-      return res.status(500).send(JSON.stringify({ err }));
+      if (!res.headersSent) return res.status(500).send(JSON.stringify({ err }));
     });
 });
 
